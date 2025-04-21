@@ -16,9 +16,11 @@ public function index()
  ]);
  }
  public function products()
- {
- return view('web.products');
- }
+{
+    return view('web.products', [
+        'title' => 'Halaman Produk',
+    ]);
+}
  public function product($slug){
  return view('web.product', ['slug' => $slug]);
  }
