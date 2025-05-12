@@ -20,7 +20,7 @@
         <flux:select label="Category" name="product_category_id" class="mb-3">
             <option value="">-- Select Category --</option>
             @foreach($categories as $category)
-                <option value="{{ $category->id }}" {{ old('product_category_id', $product->product_category_id) == $category->id ? 'selected' : '' }}>
+                <option value="{{ $category->id }}" {{ old('product_category_id', $category->product_category_id) == $category->id ? 'selected' : '' }}>
                     {{ $category->name }}
                 </option>
             @endforeach
