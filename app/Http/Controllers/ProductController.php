@@ -36,35 +36,42 @@ class ProductController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $validator = \Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:products',
-            'description' => 'nullable|string',
-            'sku' => 'required|string|max:50|unique:products',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'product_category_id' => 'nullable|exists:product_categories,id',
-            'image_url' => 'nullable|url',
-            'is_active' => 'boolean'
+{
+    $validator = \Validator::make($request->all(), [
+        'name' => 'required|string|max:255',
+        'slug' => 'required|string|max:255|unique:products',
+        'description' => 'nullable|string',
+        'sku' => 'required|string|max:50|unique:products',
+        'price' => 'required|numeric|min:0',
+        'stock' => 'required|integer|min:0',
+        'product_category_id' => 'nullable|exists:product_categories,id',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        'is_active' => 'boolean'
+    ]);
+
+    if ($validator->fails()) {
+        return redirect()->back()->withInput()->with([
+            'errors' => $validator->errors(),
+            'errorMessage' => 'Validasi Error, silakan periksa kembali.'
         ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->with([
-                'errors' => $validator->errors(),
-                'errorMessage' => 'Validasi Error, silakan periksa kembali.'
-            ]);
-        }
-
-        $product = new Product();
-        $product->fill($request->only([
-            'name', 'slug', 'description', 'sku', 'price', 'stock',
-            'product_category_id', 'image_url', 'is_active'
-        ]));
-        $product->save();
-
-        return redirect()->route('products.index')->with('successMessage', 'Produk berhasil disimpan');
     }
+
+    $product = new Product();
+    $product->fill($request->only([
+        'name', 'slug', 'description', 'sku', 'price', 'stock',
+        'product_category_id', 'is_active'
+    ]));
+
+    if ($request->hasFile('image')) {
+        $path = $request->file('image')->store('products', 'public');
+        $product->image_url = $path;
+    }
+
+    $product->save();
+
+    return redirect()->route('products.index')->with('successMessage', 'Produk berhasil disimpan');
+}
+
 
     /**
      * Display the specified resource.
